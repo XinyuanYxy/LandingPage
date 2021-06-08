@@ -11,30 +11,30 @@ const updateSec = () => {
 	sections = document.querySelectorAll('section');
 };
 // used for adding smooth scroll to an element, in this case, added to the parent nav instead of children li
-const addClickEl = (element) => {
+const addClickEl = ((element) => {
 	element.addEventListener('click', (evt) => {
 		if (evt.target.nodeName === 'LI') {
 			const viewSection = document.querySelector(`[data-nav='${evt.target.id}']`);
-			viewSection.scrollIntoView({ behavior: 'smooth', block: 'end' });
+			viewSection.scrollIntoView({ behavior: 'smooth' });
 		}
 	});
-};
+})(document.querySelector('#navbar__list'));
 //used for adding mouse over event listener to nav bar
-const addMouseOverEl = (ele) => {
+const addMouseOverEl = ((ele) => {
 	ele.addEventListener('mouseover', () => {
 		if (timerS !== null) {
 			clearTimeout(timerS);
 		}
 		ele.style.display = 'initial';
 	});
-};
-const addMouseOutEl = (ele) => {
+})(document.querySelector('.page__header'));
+const addMouseOutEl = ((ele) => {
 	ele.addEventListener('mouseout', () => {
 		ele.style.display = 'none';
 	});
-};
+})(document.querySelector('.page__header'));
 // dynamically add navbar, used when page is refresed or when a new section is generated
-const addNavBar = () => {
+const addNavBar = (() => {
 	let parent = document.getElementById('navbar__list');
 	let lis = document.createDocumentFragment();
 	sections.forEach((sec) => {
@@ -48,10 +48,10 @@ const addNavBar = () => {
 	});
 	parent.appendChild(lis);
 	document.getElementById('Section 1').classList.add('active');
-};
+})();
 
 // add event listener to the add-new-section button
-const addBtnEl = () => {
+const addBtnEl = (() => {
 	let btn = document.getElementById('addsection');
 	btn.addEventListener('click', () => {
 		let parent = document.querySelector('main');
@@ -67,13 +67,13 @@ const addBtnEl = () => {
 		updateSec();
 		addNavBar();
 	});
-};
+})();
 
 const isInViewPort = (element) => {
 	let bound = element.getBoundingClientRect();
 	return (
-		bound.top < window.innerHeight &&
-		Math.abs(window.innerHeight - bound.bottom) < 150
+		bound.top >= 0 &&
+		bound.bottom <= (window.innerHeight || document.documentElement.clientHeight)
 	);
 };
 // add active to nav bar
@@ -115,11 +115,6 @@ window.addEventListener('scroll', (evt) => {
 
 /**
  * End Functions
- * call functions
+ *
  *
  */
-addNavBar();
-addBtnEl();
-addClickEl(document.querySelector('#navbar__list'));
-addMouseOverEl(document.querySelector('.page__header'));
-addMouseOutEl(document.querySelector('.page__header'));
