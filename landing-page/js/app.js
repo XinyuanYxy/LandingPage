@@ -1,42 +1,39 @@
-/**
- *
- * Manipulating the DOM exercise.
- * Exercise programmatically builds navigation,
- * scrolls to anchors from navigation,
- * and highlights section in viewport upon scrolling.
- *
- * Dependencies: None
- *
- * JS Version: ES2015/ES6
- *
- * JS Standard: ESlint
- *
- */
+let sections = document.querySelectorAll('section');
+let timerS = null;
 
-/**
- * Define Global Variables
- *
- */
-var sections = document.querySelectorAll('section');
-var timer = null;
 /**
  * End Global Variables
  * Start Functions
  *
  */
+// used when adding new sections
 const updateSec = () => {
 	sections = document.querySelectorAll('section');
 };
-
+// used for adding smooth scroll to an element, in this case, added to the parent nav instead of children li
 const addClickEl = (element) => {
 	element.addEventListener('click', (evt) => {
 		if (evt.target.nodeName === 'LI') {
 			const viewSection = document.querySelector(`[data-nav='${evt.target.id}']`);
-			viewSection.scrollIntoView(false);
+			viewSection.scrollIntoView({ behavior: 'smooth', block: 'end' });
 		}
 	});
 };
-
+//used for adding mouse over event listener to nav bar
+const addMouseOverEl = (ele) => {
+	ele.addEventListener('mouseover', () => {
+		if (timerS !== null) {
+			clearTimeout(timerS);
+		}
+		ele.style.display = 'initial';
+	});
+};
+const addMouseOutEl = (ele) => {
+	ele.addEventListener('mouseout', () => {
+		ele.style.display = 'none';
+	});
+};
+// dynamically add navbar, used when page is refresed or when a new section is generated
 const addNavBar = () => {
 	let parent = document.getElementById('navbar__list');
 	let lis = document.createDocumentFragment();
@@ -50,7 +47,10 @@ const addNavBar = () => {
 		}
 	});
 	parent.appendChild(lis);
+	document.getElementById('Section 1').classList.add('active');
 };
+
+// add event listener to the add-new-section button
 const addBtnEl = () => {
 	let btn = document.getElementById('addsection');
 	btn.addEventListener('click', () => {
@@ -71,9 +71,12 @@ const addBtnEl = () => {
 
 const isInViewPort = (element) => {
 	let bound = element.getBoundingClientRect();
-	return bound.top < window.innerHeight && bound.bottom >= window.innerHeight;
+	return (
+		bound.top < window.innerHeight &&
+		Math.abs(window.innerHeight - bound.bottom) < 150
+	);
 };
-
+// add active to nav bar
 const setNavActive = (ele) => {
 	ele.classList.add('active');
 };
@@ -96,10 +99,10 @@ const setSectionActive = () => {
 window.addEventListener('scroll', (evt) => {
 	let headerNav = document.querySelector('.page__header');
 	headerNav.style.display = 'initial';
-	if (timer !== null) {
-		clearTimeout(timer);
+	if (timerS !== null) {
+		clearTimeout(timerS);
 	}
-	timer = setTimeout(() => {
+	timerS = setTimeout(() => {
 		headerNav.style.display = 'none';
 		setSectionActive();
 	}, 500);
@@ -118,3 +121,5 @@ window.addEventListener('scroll', (evt) => {
 addNavBar();
 addBtnEl();
 addClickEl(document.querySelector('#navbar__list'));
+addMouseOverEl(document.querySelector('.page__header'));
+addMouseOutEl(document.querySelector('.page__header'));
